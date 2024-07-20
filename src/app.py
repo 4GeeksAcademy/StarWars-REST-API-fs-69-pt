@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Planet, People
 #from models import Person
 
 app = Flask(__name__)
@@ -44,6 +44,57 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+#GET de Todas las personas
+@app.route('/people', methods=['GET'])
+def get_all_people():
+    people = People.query.all()
+    return jsonify([person.serialize() for person in people]), 200
+
+#GET de una persona
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_person(people_id):
+    person = People.query.get(people_id)
+    if person is None:
+        raise APIException('Person not found', status_code=404)
+    return jsonify(person.serialize()), 200
+
+#GET  de todos los planeta 
+@app.route('/planets', methods=['GET'])
+def get_all_planets():
+    planets = Planet.query.all()
+    return jsonify([planet.serialize() for planet in planets]), 200
+
+#GET de un planeta
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
+    planet = Planet.query.get(planet_id)
+    if planet is None:
+        raise APIException('Planet not found', status_code=404)
+    return jsonify(planet.serialize()), 200
+
+#POST nueva personas
+@app.route('/people', methods=['POST'])
+def add_person():
+    body = request.get_json()
+    new_person = People(name=body['name'], birth_year=body['birth_year'], gender=body['gender'])
+    db.session.add(new_person)
+    db.session.commit()
+    return jsonify(new_person.serialize()), 201
+
+#POST nuevos planetas
+@app.route('/planets', methods=['POST'])
+def create_planet():
+    data = request.get_json()
+    new_planet = Planet(
+        name=data['name'],
+        climate=data.get('climate'),
+        terrain=data.get('terrain'),
+        population=data.get('population')
+    )
+    db.session.add(new_planet)
+    db.session.commit()
+    return jsonify(new_planet.serialize()), 201
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

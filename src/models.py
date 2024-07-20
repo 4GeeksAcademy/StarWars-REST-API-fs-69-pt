@@ -17,3 +17,37 @@ class User(db.Model):
             "email": self.email,
             # do not serialize the password, its a security breach
         }
+    
+class Planet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    climate = db.Column(db.String(80), nullable=False)
+    terrain = db.Column(db.String(80), nullable=False)
+
+    def __repr__(self):
+        return '<Planet %r>' % self.name
+    
+    def serialize(self):
+        return{
+            "id": self.id,
+            "name": self.name,
+           " climate": self.climate,
+           "terrain": self.terrain
+        }
+    
+class People(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    birth_years = db.Column(db.String(80), nullable=False)
+    gener = db.Column(db.String(80), nullable=False)
+
+    def __repr__(self):
+        return '<People %r>' % self.name
+    
+    def __serialize__(self):
+        return{
+            "id": self.id,
+            "name": self.name,
+            "birth_years": self.birth_years,
+            "gender": self.gender
+        }
